@@ -28,9 +28,7 @@ export default router;
 
 router.post("/create_logo_user",logo.single('image'),async function (req, res,next) {
   try{
-    const {logo} = req.body;
-    console.log("logo",logo)
-    res.status(200).json({message:"ok"})
+    res.status(200).json({message:"ok",data:`${process.env.URL_PATH}/logos/${req.file.filename}`})
 
   }catch(err){
     res.status(400).json({error:err.message})
@@ -38,9 +36,7 @@ router.post("/create_logo_user",logo.single('image'),async function (req, res,ne
 })
 router.post("/create_image_product",produts.single('image'),async function(req,res){
   try{
-    const {logo} = req.body;
-    console.log("logo",logo)
-    res.status(200).json({message:"ok"})
+    res.status(200).json({message:"ok",data:`${process.env.URL_PATH}/products/${req.file.filename}`})
 
   }catch(err){
     res.status(400).json({error:err.message})
