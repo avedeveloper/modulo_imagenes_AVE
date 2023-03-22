@@ -5,6 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import express_session from "express-session";
 import api from "./routes/index.js";
+import csv from "./routes/csv.js"
 var config = dotenv.config();
 global.config = config.parsed;
 
@@ -68,6 +69,7 @@ app.use(express_session({
 }));
 
 app.use("", api);
+app.use("/csv", csv);
 
 console.log("Servidor API escuchando en       ", process.env.PORT);
 console.log("Environment mode", process.env.environment);
