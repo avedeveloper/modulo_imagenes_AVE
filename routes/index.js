@@ -18,23 +18,27 @@ const storage = multer.diskStorage({
 
 const logo = multer({ storage });
 const upload = logo.single('image')
-const products = multer({ storage:multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, `${process.env.BASE_PATH_IMAGES}/products`); // Ruta donde se guardará la imagen
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Nombre de archivo único
-  }
-})});
+const products = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, `${process.env.BASE_PATH_IMAGES}/products`); // Ruta donde se guardará la imagen
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname); // Nombre de archivo único
+    }
+  })
+});
 const uploadProducts = products.single('image')
-const variants = multer({ storage:multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, `${process.env.BASE_PATH_IMAGES}/variants`); // Ruta donde se guardará la imagen
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Nombre de archivo único
-  }
-})});
+const variants = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, `${process.env.BASE_PATH_IMAGES}/variants`); // Ruta donde se guardará la imagen
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname); // Nombre de archivo único
+    }
+  })
+});
 const uploadVariants = variants.single('image')
 
 router.post("/create_logo_user", logo.single('image'), async function (req, res, next) {
@@ -47,25 +51,31 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
     if (!id_wordpress || !token) {
       throw new Error("id_wordpress or token not found")
     }
-    console.log("aca")
-
-    const response = await axios.post(`${process.env.URL_ADMIN_SERVICE}`, {
+    console.log("aca",req.file.filename)
+    console.log(JSON.stringify({
       id_wordpress: req.body.id_wordpress,
       path: `${process.env.URL_PATH}/logos/${req.file.filename}`
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        "Authorization": `${api_key}`,
-        'authorization-token': `${token}`
-      }
+    }))
+    const data = {
+      id_wordpress: req.body.id_wordpress,
+      path: `${process.env.URL_PATH}/logos/${req.file.filename}`
     }
-    )
-    if (response.data.err.length > 0) {
+    const response = await axios.post('http://46.101.159.194:47300/bgwp/admin/set_logo',data,{
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': api_key,
+          'authorization-token': token
+      },
+    }).then((res)=>{
+      console.log("aca res ", res.data)
+      return res.data
+    }).catch((err)=>{
+      console.log("aca err ", err.response.data)
+      return err.response.data
+    })
+    if (response.err.length > 0) {
       res.status(400).json({ error: response.data.err })
     }
-    console.log("aca")
-
     res.status(200).json({
       message: "ok", data: {
         path: `${process.env.URL_PATH}/logos/${req.file.filename}`,
@@ -76,10 +86,12 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
   } catch (err) {
     // console.log(err)
     // console.log(err.response.data.message)
-    res.status(400).json({ error: err.response })
+    res.status(400).send({ error: err.response })
   }
 })
-router.post("/create_image_product", async function (req, res,next) {
+
+
+router.post("/create_image_product", async function (req, res, next) {
   try {
     console.log("aca")
     uploadProducts(req, res, async function (err) {
@@ -96,14 +108,14 @@ router.post("/create_image_product", async function (req, res,next) {
         }
       })
     })
-    
+
   } catch (err) {
     res.status(400).json({ error: err.message })
   }
 })
 
-router.post("/create_image_variant_product",async function(req,res,next){
-  try{
+router.post("/create_image_variant_product", async function (req, res, next) {
+  try {
     uploadVariants(req, res, async function (err) {
       if (err) {
         throw new Error(err.message)
@@ -117,35 +129,35 @@ router.post("/create_image_variant_product",async function(req,res,next){
         }
       })
     })
-  }catch(err){
+  } catch (err) {
     res.status(400).json({ error: err.message })
   }
 })
 
 router.post("/delete_image_product", async function (req, res, next) {
-  try{
-    const {path} = req.body
-    if(!path){
+  try {
+    const { path } = req.body
+    if (!path) {
       throw new Error("path not found")
     }
     fs.unlinkSync(`${process.env.BASE_PATH_IMAGES}/products/${path.split("/").pop()}`)
-    res.status(200).json({message:"ok"})
-  }catch(err){
+    res.status(200).json({ message: "ok" })
+  } catch (err) {
     console.log(err)
-    res.json({error:err.message})
+    res.json({ error: err.message })
   }
 })
 router.post("/delete_image_variant_product", async function (req, res, next) {
-  try{
-    const {path} = req.body
-    if(!path){
+  try {
+    const { path } = req.body
+    if (!path) {
       throw new Error("path not found")
     }
     fs.unlinkSync(`${process.env.BASE_PATH_IMAGES}/variants/${path.split("/").pop()}`)
-    res.status(200).json({message:"ok"})
-  }catch(err){
+    res.status(200).json({ message: "ok" })
+  } catch (err) {
     console.log(err)
-    res.json({error:err.message})
+    res.json({ error: err.message })
   }
 })
 export default router;
