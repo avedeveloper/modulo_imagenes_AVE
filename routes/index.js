@@ -71,7 +71,7 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
   } catch (err) {
     // console.log(err)
     // console.log(err.response.data.message)
-    res.status(400).json({ error: err.response.data.message })
+    res.status(400).json({ error: err.response })
   }
 })
 router.post("/create_image_product", async function (req, res,next) {
