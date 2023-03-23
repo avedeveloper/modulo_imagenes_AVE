@@ -36,15 +36,18 @@ const variants = multer({ storage:multer.diskStorage({
   }
 })});
 const uploadVariants = variants.single('image')
+
 router.post("/create_logo_user", logo.single('image'), async function (req, res, next) {
   try {
     const { id_wordpress } = req.body
     // console.log(req.headers)
     const token = req.headers['authorization-token']
     const api_key = req.headers['authorization']
+    console.log("aca")
     if (!id_wordpress || !token) {
       throw new Error("id_wordpress or token not found")
     }
+    console.log("aca")
 
     const response = await axios.post(`${process.env.URL_ADMIN_SERVICE}`, {
       id_wordpress: req.body.id_wordpress,
@@ -61,6 +64,8 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
     if (response.data.err.length > 0) {
       res.status(400).json({ error: response.data.err })
     }
+    console.log("aca")
+
     res.status(200).json({
       message: "ok", data: {
         path: `${process.env.URL_PATH}/logos/${req.file.filename}`,
@@ -76,9 +81,11 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
 })
 router.post("/create_image_product", async function (req, res,next) {
   try {
+    console.log("aca")
     uploadProducts(req, res, async function (err) {
       if (err) {
-        throw new Error(err.message)
+        console.log(err)
+        res.status(400).json({ error: err.message })
       }
       // console.log(err)
       // console.log(req)
