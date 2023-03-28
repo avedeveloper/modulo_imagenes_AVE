@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import express_session from "express-session";
 import api from "./routes/index.js";
 import csv from "./routes/csv.js"
+import massiveLoadImages from "./routes/massiveLoadImages.js"
 var config = dotenv.config();
 global.config = config.parsed;
 
@@ -70,7 +71,7 @@ app.use(express_session({
 
 app.use("", api);
 app.use("/csv", csv);
-
+app.use("/imagesArray", massiveLoadImages);
 console.log("Servidor API escuchando en       ", process.env.PORT);
 console.log("Environment mode", process.env.environment);
 server.listen(process.env.PORT);
