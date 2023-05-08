@@ -60,7 +60,7 @@ router.post("/create_logo_user", logo.single('image'), async function (req, res,
       id_wordpress: req.body.id_wordpress,
       path: `${process.env.URL_PATH}/logos/${req.file.filename}`
     }
-    const response = await axios.post('http://46.101.159.194:47300/bgwp/admin/set_logo',data,{
+    const response = await axios.post('http://localhost:47300/bgwp/admin/set_logo',data,{
       headers: {
           'Content-Type': 'application/json',
           'Authorization': api_key,
